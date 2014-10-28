@@ -324,31 +324,36 @@ bool Kinect_Wrapper::Trigger_Depth_Image(int index, int min, int max)
             image = Mat(nHeight, nWidth, CV_16UC1, pBuffer).clone();
 
             UINT16* data = (UINT16*) image.data;
-/*
+
             // Erode to filter some noise
             Mat range_image;
             Mat element = getStructuringElement(MORPH_RECT, Size(3,3));
             inRange(image, Scalar(min), Scalar(max), range_image);
             erode(range_image, range_image, element);
             uchar* range_data = (uchar*) range_image.data;
-*/
+
+
             // filter according to min and max
             for (int y=0; y < nHeight; y++)
             {
                 for (int x=0; x< nWidth; x++)
                 {
                     UINT16 value = data[y * nWidth + x];
-                    //uchar mask_value = range_data[y * nWidth + x];
+                    uchar mask_value = range_data[y * nWidth + x];
 
-                    if  ( (value < min) || (value > max) ) //|| mask_value == 0)
+                    if  ( (value < min) || (value > max) || (mask_value == 0) )
                     {
                         data[y * nWidth + x] = 0;
                     }
                 }
             }
 
-
             image.convertTo(depth_frames_display[index], CV_8UC1, 255.0 / max);
+
+            // extract contours on depth image
+            findContours(range_image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+
+
             depth_frames[index] = image;
 
         }
@@ -376,6 +381,16 @@ bool Kinect_Wrapper::Trigger_Depth_Image(int index, int min, int max)
 
 Mat Kinect_Wrapper::Get_Color_Image(int index)
 {
+    // assume depth image has been triggered, highlight the depth contours on the color image
+/*
+    Mat c(depth_frames[index].rows, depth_frames[index].cols, CV_8UC4, Scalar(255,255,255, 255));
+    drawContours(c, contours, -1, Scalar(0,0,0,0), 2);
+
+    Mat c_resize(color_frames[index].rows, color_frames[index].cols, CV_8UC4, Scalar(0,0,0, 0));
+    resize(c, c_resize, Size(color_frames[index].cols, color_frames[index].rows));
+
+    color_frames[index] = color_frames[index] & c_resize;
+*/
     return color_frames[index];
 }
 
@@ -384,7 +399,7 @@ Mat Kinect_Wrapper::Get_Depth_Image_Display(int index)
     return depth_frames_display[index];
 }
 
-vector<pcl::PointXYZRGB> Kinect_Wrapper::Get_Camera_Points(int index)
+vector<pcl::PointXYZRGB, Eigen::aligned_allocator<PointXYZRGB> > Kinect_Wrapper::Get_Camera_Points(int index)
 {
     UINT point_count = depth_frames[index].rows * depth_frames[index].cols;
 
@@ -398,7 +413,7 @@ vector<pcl::PointXYZRGB> Kinect_Wrapper::Get_Camera_Points(int index)
     m_pCoordinateMapper[index]->MapDepthFrameToColorSpace(point_count, (const UINT16*) depth_frames[index].data, point_count, color_points);
 
 
-    vector<pcl::PointXYZRGB> points;
+    vector<pcl::PointXYZRGB, Eigen::aligned_allocator<PointXYZRGB> > points;
     pcl::PointXYZRGB point;
     Vec4b vv;
 

@@ -7,6 +7,7 @@
 #include "GLWidget.h"
 #include "cloud_processor.h"
 
+using namespace pcl;
 
 namespace Ui {
 class MainWindow;

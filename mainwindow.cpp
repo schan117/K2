@@ -25,6 +25,40 @@ MainWindow::MainWindow(QWidget *parent) :
 
     write_points = false;
 
+    /*
+
+    QFile qf("Output.asc");
+    qf.open(QFile::Text | QFile::ReadWrite);
+
+    QTextStream qts(&qf);
+
+    vector<PointXYZRGB, Eigen::aligned_allocator<PointXYZRGB> > input;
+
+    while (!qts.atEnd())
+    {
+        float x, y, z;
+
+        qts >> x >> y >> z;
+
+        PointXYZRGB p;
+        p.x = x;
+        p.y = y;
+        p.z = z;
+
+        input.push_back(p);
+    }
+
+    qf.close();
+
+    cloud_processor.Set_Cloud_To_Process(input);
+    cloud_processor.Apply_Statistical_Outlier_Removal(50, 1.0);
+
+    input = cloud_processor.Get_Processed_Cloud();
+
+    qDebug() << input.size();
+
+    */
+
 }
 
 MainWindow::~MainWindow()
@@ -59,32 +93,33 @@ void MainWindow::On_Color_And_Depth_Frame_Captured(int index)
     ui->Depth_Image->setPixmap(QPixmap::fromImage(qi2).scaled(ui->Depth_Image->width(), ui->Depth_Image->height()));
 
     // Show in 3D
-    std::vector<pcl::PointXYZRGB> points = kinect_wrapper.Get_Camera_Points(index);
+    std::vector<PointXYZRGB, Eigen::aligned_allocator<PointXYZRGB> > points = kinect_wrapper.Get_Camera_Points(index);
 
     ui->View->point_cloud = points;
     ui->View->draw_points = true;
     ui->View->updateGL();
 
-
+    // Export points
     if (write_points)
     {
-        QFile qf("Output.asc");
+        cloud_processor.Output_ASC_File("Cloud.asc", points);
 
-        qf.open(QFile::Text | QFile::ReadWrite);
-
-        QTextStream qts(&qf);
-
-        for (int i=0; i<points.size(); i++)
+        if (ui->Process->isChecked())
         {
-              qts << points[i].x << "\t" << points[i].y << "\t" << points[i].z << "\n\r";
+            cloud_processor.Set_Cloud_To_Process(points);
+            cloud_processor.Apply_Statistical_Outlier_Removal(50, 0.8);
+            points = cloud_processor.Get_Processed_Cloud();
+            cloud_processor.Set_Cloud_To_Process(points);
+            cloud_processor.Apply_Voxel_Grid(3);
+            points = cloud_processor.Get_Processed_Cloud();
+            cloud_processor.Output_ASC_File("Processed.asc", points);
+            cloud_processor.Output_Processed_Cloud_As_PCD("Processed.pcd");
         }
 
-        qf.close();
 
         write_points = false;
 
     }
-
 
     capture_thread.mutex.unlock();
 }

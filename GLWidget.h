@@ -12,6 +12,8 @@
 #include <pcl/point_types.h>
 #endif
 
+using namespace pcl;
+
 
 class GLWidget : public QGLWidget
 {
@@ -27,7 +29,7 @@ public:
 
     bool draw_points;
 
-    std::vector<pcl::PointXYZRGB> point_cloud;
+    std::vector<PointXYZRGB, Eigen::aligned_allocator<PointXYZRGB> > point_cloud;
 
 protected:
     void initparam();

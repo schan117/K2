@@ -81,14 +81,14 @@
         <widget class="QLabel" name="Depth_Image">
          <property name="minimumSize">
           <size>
-           <width>256</width>
-           <height>212</height>
+           <width>480</width>
+           <height>270</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>256</width>
-           <height>212</height>
+           <width>480</width>
+           <height>270</height>
           </size>
          </property>
          <property name="text">
@@ -126,7 +126,7 @@
      <string>Capture</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>900</x>
@@ -166,6 +166,19 @@
       </widget>
      </item>
     </layout>
+   </widget>
+   <widget class="QCheckBox" name="Process">
+    <property name="geometry">
+     <rect>
+      <x>1020</x>
+      <y>700</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CheckBox</string>
+    </property>
    </widget>
   </widget>
   <widget class="QToolBar" name="mainToolBar">

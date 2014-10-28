@@ -12,6 +12,8 @@
 #endif
 
 using namespace cv;
+using namespace std;
+using namespace pcl;
 
 class Kinect_Wrapper
 {
@@ -28,7 +30,7 @@ public:
 
     Mat Get_Color_Image(int index);
     Mat Get_Depth_Image_Display(int index);
-    vector<pcl::PointXYZRGB> Get_Camera_Points(int index);
+    vector<pcl::PointXYZRGB, Eigen::aligned_allocator<PointXYZRGB> > Get_Camera_Points(int index);
 
 private:
 
@@ -40,6 +42,10 @@ private:
     Mat color_frames[MAX_KINECT_COUNT];
     Mat depth_frames[MAX_KINECT_COUNT];
     Mat depth_frames_display[MAX_KINECT_COUNT];
+
+    vector<vector<cv::Point> > contours;
+    vector<Vec4i> hierarchy;
+
 
 };
 
