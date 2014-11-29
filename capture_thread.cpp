@@ -19,7 +19,7 @@ void Capture_Thread::run()
         mutex.lock();
 
         if ( (kinect_wrapper->Trigger_Color_Image(current_camera_index)) &&
-             (kinect_wrapper->Trigger_Depth_Image(current_camera_index, depth_min, depth_max)) )
+             (kinect_wrapper->Trigger_Depth_Image(current_camera_index, 100, 412, 100, 324, depth_min, depth_max)) )
         {
             emit Color_And_Depth_Frame_Captured(current_camera_index);
         }

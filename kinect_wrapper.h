@@ -26,7 +26,7 @@ public:
     HRESULT Open_Depth_Stream(int index);
     HRESULT Open_Coordinate_Mapper(int index);
     bool Trigger_Color_Image(int index);
-    bool Trigger_Depth_Image(int index, int min, int max);
+    bool Trigger_Depth_Image(int index, int min_x, int max_x, int min_y, int max_y, int min_z, int max_z);
 
     Mat Get_Color_Image(int index);
     Mat Get_Depth_Image_Display(int index);

@@ -107,7 +107,7 @@ void MainWindow::On_Color_And_Depth_Frame_Captured(int index)
         if (ui->Process->isChecked())
         {
             cloud_processor.Set_Cloud_To_Process(points);
-            cloud_processor.Apply_Statistical_Outlier_Removal(50, 0.8);
+            cloud_processor.Apply_Statistical_Outlier_Removal(50, 1);
             points = cloud_processor.Get_Processed_Cloud();
             cloud_processor.Set_Cloud_To_Process(points);
             cloud_processor.Apply_Voxel_Grid(3);

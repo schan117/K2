@@ -258,7 +258,7 @@ bool Kinect_Wrapper::Trigger_Color_Image(int index)
     }
 }
 
-bool Kinect_Wrapper::Trigger_Depth_Image(int index, int min, int max)
+bool Kinect_Wrapper::Trigger_Depth_Image(int index, int min_x, int max_x, int min_y, int max_y, int min_z, int max_z)
 {
     if (!m_pDepthFrameReader[index])
     {
@@ -328,7 +328,7 @@ bool Kinect_Wrapper::Trigger_Depth_Image(int index, int min, int max)
             // Erode to filter some noise
             Mat range_image;
             Mat element = getStructuringElement(MORPH_RECT, Size(3,3));
-            inRange(image, Scalar(min), Scalar(max), range_image);
+            inRange(image, Scalar(min_z), Scalar(max_z), range_image);
             erode(range_image, range_image, element);
             uchar* range_data = (uchar*) range_image.data;
 
@@ -341,14 +341,20 @@ bool Kinect_Wrapper::Trigger_Depth_Image(int index, int min, int max)
                     UINT16 value = data[y * nWidth + x];
                     uchar mask_value = range_data[y * nWidth + x];
 
-                    if  ( (value < min) || (value > max) || (mask_value == 0) )
+                    if  ( (value < min_z) ||
+                          (value > max_z) ||
+                          (x < min_x)     ||
+                          (x > max_x)     ||
+                          (y < min_y)     ||
+                          (y > max_y)     ||
+                          (mask_value == 0) )
                     {
                         data[y * nWidth + x] = 0;
                     }
                 }
             }
 
-            image.convertTo(depth_frames_display[index], CV_8UC1, 255.0 / max);
+            image.convertTo(depth_frames_display[index], CV_8UC1, 255.0 / max_z);
 
             // extract contours on depth image
             findContours(range_image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);

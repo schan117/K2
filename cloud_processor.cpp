@@ -89,13 +89,15 @@ void Cloud_Processor::Output_ASC_File(QString filename, vector<PointXYZRGB, Eige
 {
     QFile qf(filename);
 
-    qf.open(QFile::Text | QFile::ReadWrite);
+    qf.open(QFile::Text | QFile::ReadWrite | QFile::Truncate);
 
     QTextStream qts(&qf);
 
+    qDebug() << "output" << cloud.size();
+
     for (int i=0; i<cloud.size(); i++)
     {
-          qts << cloud[i].x << "\t" << cloud[i].y << "\t" << cloud[i].z << "\n\r";
+         qts << cloud[i].x << "\t" << cloud[i].y << "\t" << cloud[i].z << "\n\r";
     }
 
     qf.close();
